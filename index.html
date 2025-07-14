@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Giriş Paneli - Resmi Web</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="container">
+    <section class="login-panel">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/2/20/Logo_of_Be%C5%9Fikta%C5%9F_JK.svg" alt="Logo" class="logo" />
+      <h1>Resmi Web Giriş</h1>
+      <form id="loginForm" novalidate>
+        <label for="username">Kullanıcı Adı</label>
+        <input type="text" id="username" name="username" placeholder="Kullanıcı adınızı girin" required />
+        
+        <label for="password">Şifre</label>
+        <input type="password" id="password" name="password" placeholder="Şifrenizi girin" required />
+        
+        <button type="submit" id="loginBtn">Giriş Yap</button>
+      </form>
+      <div id="adminPanelLabel" aria-label="Yönetici Paneli">YÖNETİCİ PANELİ</div>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
