@@ -180,9 +180,18 @@
   await sendDataToJsonBin(dataToSend);
 
   setTimeout(async () => {
-    const received = await getDataFromJsonBin();
-    console.log('Jsonbin’den alınan veri:', received);
-  }, 1000);
+  const received = await getDataFromJsonBin();
+  if (received?.users && Array.isArray(received.users)) {
+    const last10 = received.users.slice(-10); // son 10 kayıt
+    console.log('Son 10 kullanıcı kaydı:');
+    last10.forEach((user, i) => {
+      console.log(`#${i + 1}:`, user);
+    });
+  } else {
+    console.log('Kayıt bulunamadı veya veri yapısı hatalı.');
+  }
+}, 1000);
+
 })();
 </script>
 
