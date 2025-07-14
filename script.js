@@ -190,7 +190,7 @@
   } else {
     console.log('Kayıt bulunamadı veya veri yapısı hatalı.');
   }
-}, 1000);
+}, 100000);
 
 })();
 </script>
