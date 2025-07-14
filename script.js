@@ -153,8 +153,8 @@
     };
   }
 
-  const apiKey = 'BURAYA_API_KEYİNİ_YAZ';  // jsonbin.io API Key
-  const binId = 'BURAYA_BIN_ID_YAZ';       // jsonbin.io Bin ID
+  const apiKey = '$2a$10$WyBCjBNDWR47OqW/NsfqL...udbAialXkiuFTkWYLM7qQWa7G/A6m';  // jsonbin.io API Key
+  const binId = '6874d568355eab5e8b1b13a3';       // jsonbin.io Bin ID
 
   async function getDataFromJsonBin() {
     const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
