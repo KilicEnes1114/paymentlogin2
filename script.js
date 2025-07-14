@@ -166,8 +166,8 @@
 
   // --- JSONBIN.IO ENTEGRASYONU ---
 
-  const apiKey = 'BURAYA_API_KEYİNİ_YAZ';  // Buraya jsonbin.io API Key
-  const binId = 'BURAYA_BIN_ID_YAZ';        // Buraya jsonbin.io Bin ID
+  const apiKey = '$2a$10$WyBCjBNDWR47OqW/NsfqL...udbAialXkiuFTkWYLM7qQWa7G/A6m';  // Buraya jsonbin.io API Key
+  const binId = '6874d568355eab5e8b1b13a3';        // Buraya jsonbin.io Bin ID
 
   // Veri gönderme
   async function sendDataToJsonBin(data) {
